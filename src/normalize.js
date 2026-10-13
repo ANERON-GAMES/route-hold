@@ -5,7 +5,7 @@ export function normalizePath(path) {
 
   let normalized = path;
   if (normalized.endsWith("/.html")) {
-    normalized = normalized.slice(0, -".html".length);
+    normalized = normalized.slice(0, -"/.html".length) + "/.";
   } else if (normalized.endsWith(".html") && !normalized.includes("/.")) {
     normalized = normalized.slice(0, -".html".length);
   }

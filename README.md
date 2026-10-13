@@ -117,9 +117,9 @@ Return the canonical path used by every later check.
 
 The steps run in this order. The first HTML step that matches wins, and the slash step always runs after it.
 
-1. If `path` ends with `/.html`, remove that trailing `.html`. The slash that preceded it stays. `/docs/.html` becomes `/docs/`. `/.html` becomes `/`.
+1. If `path` ends with `/.html`, remove the final `html` and keep the `/.`. `/docs/.html` becomes `/docs/.`. `/.html` becomes `/.`.
 2. Otherwise, if `path` ends with `.html` and does not contain the two characters `/.`, remove that trailing `.html`. `/docs/index.html` becomes `/docs/index`. `/files/.draft.html` contains `/.`, so it stays `/files/.draft.html`.
-3. While the length is greater than 1 and the value ends with `/`, remove one trailing slash. `/` stays `/`. `/docs/` becomes `/docs`. The root produced by step 1, `/`, stays `/`.
+3. While the length is greater than 1 and the value ends with `/`, remove one trailing slash. `/` stays `/`. `/docs/` becomes `/docs`. A result that ends in `/.`, such as `/docs/.` or `/.`, ends in a dot, so this step leaves it in place.
 
 Step 3 does not start the HTML rules again. `/pricing.html/` loses the slash and stays `/pricing.html`. `/docs/.html/` loses the slash and stays `/docs/.html`. The suffix match is case-sensitive: `/Pricing.HTML` stays `/Pricing.HTML`.
 
@@ -202,7 +202,7 @@ The bypass is the second half of that flag. `expectedKey: ""` means this deploym
 
 The cache header is on redirects only. A continue result lets the downstream response choose its own caching. A redirect back and forth between home and the holding page must not be stored.
 
-Normalization comes first so the later rules see one spelling of a path. `/api/` becomes `/api` and still matches the API rule. `/maintenance/` is the holding page. The `/.html` case is the careful one: a path that ends with `/.html` does contain `/.`, and the general HTML rule would leave the suffix in place. The first HTML step removes that suffix anyway, then the slash step collapses `/docs/` to `/docs`. Paths that contain `/.` for any other reason, such as `/files/.draft.html` or `/foo/./bar.html`, keep a trailing `.html`. That split is deliberate. Hidden files and dot segments are left alone. The directory form `/.html` is folded into the directory.
+Normalization comes first so the later rules see one spelling of a path. `/api/` becomes `/api` and still matches the API rule. `/maintenance/` is the holding page. The `/.html` case is the careful one: a path that ends with `/.html` does contain `/.`, and the general HTML rule would leave the suffix in place. The first HTML step still removes the final `html` and keeps the `/.`, so `/docs/.html` becomes `/docs/.` and `/.html` becomes `/.`. Paths that contain `/.` for any other reason, such as `/files/.draft.html` or `/foo/./bar.html`, keep a trailing `.html`. That split is deliberate. Hidden files and dot segments are left alone. Only the exact `/.html` ending drops `html`.
 
 This module does not open sockets, set cookies, store the flag, or choose the holding page for a deployment. `holdPath` and `homePath` are arguments. The default holding route is `/maintenance` and the default home route is `/`.
 

@@ -17,9 +17,9 @@ test("an ordinary html suffix is removed", () => {
   assert.equal(normalizePath("/page.html.html"), "/page.html");
 });
 
-test("a directory html suffix keeps the slash and then the slash rule collapses it", () => {
-  assert.equal(normalizePath("/docs/.html"), "/docs");
-  assert.equal(normalizePath("/.html"), "/");
+test("a directory html suffix keeps the slash-dot", () => {
+  assert.equal(normalizePath("/docs/.html"), "/docs/.");
+  assert.equal(normalizePath("/.html"), "/.");
   assert.equal(normalizePath("/.html/"), "/.html");
 });
 
