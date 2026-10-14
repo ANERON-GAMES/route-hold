@@ -68,15 +68,15 @@ const openHold = decideRoute({
 
 `held` is `{ action: "redirect", location: "/maintenance", cacheControl: "no-store, no-cache, must-revalidate, max-age=0" }`. The trailing slash is normalized away before the decision, and `/pricing` is an ordinary page. `health` is `{ action: "next" }`. `/health/live` starts with the caller prefix `/health`, so the maintenance flag is never applied. `openHold` redirects to `/` with the same cache header. The site is open, and the holding route must not keep visitors.
 
-A deployment that also wants other areas to stay up adds them to the same array. `/environment` and `/smart-home` are examples of those caller parameters. They are ordinary strings. Passing them makes those paths continue. Leaving them out sends those paths to the holding route while maintenance is on.
+A deployment that also wants other areas to stay up adds them to the same array. `/docs` and `/blog` are examples of those caller parameters. They are ordinary strings. Passing them makes those paths continue. Leaving them out sends those paths to the holding route while maintenance is on.
 
 ```js
 decideRoute({
-  path: "/environment",
+  path: "/docs",
   maintenance: true,
   presentedKey: "",
   expectedKey: "",
-  allowPrefixes: ["/health", "/status", "/environment", "/smart-home"],
+  allowPrefixes: ["/health", "/status", "/docs", "/blog"],
   adminPrefixes: []
 });
 ```
@@ -208,7 +208,7 @@ Each call returns a new object.
 
 The order is the product. A maintenance switch that runs first would turn `/api/health` into an HTML redirect and would turn `/app.css` into an HTML redirect. The holding page would then be unable to load the assets it needs, and a probe would look like a failure. Those exemptions are therefore decided before the flag.
 
-The exemptions are the API root, static assets, and the prefixes the caller supplies. Admin prefixes are caller config, and the library does not ship a built-in list. Product pages are not exempt on their own. A path such as `/environment` or `/smart-home` continues only when the caller puts that string in `allowPrefixes`. The same function serves any site. The site map stays at the call site.
+The exemptions are the API root, static assets, and the prefixes the caller supplies. Admin prefixes are caller config, and the library does not ship a built-in list. Product pages are not exempt on their own. A path such as `/docs` or `/blog` continues only when the caller puts that string in `allowPrefixes`. The same function serves any site. The site map stays at the call site.
 
 Allow prefixes use string `startsWith` after normalization. That is a prefix test, not a route table. `/health` also matches `/healthcare`. Callers that want a tighter gate pass a longer prefix, such as `/health/`. That entry normalizes to `/health`, so the slash does not become a boundary. Admin prefixes use a boundary instead: the path must equal the prefix or start with the prefix plus `/`. A caller that passes `/panel` continues `/panel` and `/panel/tools`, and holds `/panelist`. API uses that same boundary: `/api` and `/api/health` continue, `/apiary` does not.
 
